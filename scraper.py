@@ -31,7 +31,12 @@ class TrustpilotScraper:
         self.driver = None
 
     def _configurar_driver(self):
-        service = Service(ChromeDriverManager().install())
+        if os.path.exists("/usr/bin/chromedriver"):
+            self.options.binary_location = "/usr/bin/chromium"
+            service = Service("/usr/bin/chromedriver")
+        else:
+            service = Service(ChromeDriverManager().install())
+        
         self.driver = webdriver.Chrome(service=service, options=self.options)
         
         self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'})
