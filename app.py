@@ -344,7 +344,53 @@ if st.session_state.analisis_activo:
                 st.info(resumen_final) 
 
             with tab2:
-                st.markdown("###¿De qué hablan exactamente los clientes?")
+                st.markdown("### ¿De qué hablan exactamente los clientes?")
+
+                if not resultados["top_palabras_gen"].empty:
+                    top_row = resultados["top_palabras_gen"].iloc[0]
+                    top_word = top_row["palabra"]
+                    
+                    ratio_usuarios = max(1, int(top_row["total_reviews"] / top_row["doc_count"])) if top_row["doc_count"] > 0 else 0
+                    veces_por_resena = top_row["total_count"] / top_row["doc_count"] if top_row["doc_count"] > 0 else 1
+
+                    top_pos = resultados["top_palabras_pos"]
+                    top_neg = resultados["top_palabras_neg"]
+
+                    st.write("")
+                    col_badge_word, col_text_word = st.columns([1, 6])
+
+                    with col_badge_word:
+                        st.markdown(f"""
+                            <div style="
+                                background-color: #E0E0E0;
+                                border-radius: 50%;
+                                width: 70px;
+                                height: 70px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 30px;
+                                font-weight: bold;
+                                color: #333;
+                                border: 2px solid #CCC;
+                            ">1</div>
+                        """, unsafe_allow_html=True)
+
+                    with col_text_word:
+                        st.markdown(f"**LA PALABRA ESTRELLA: '{top_word.upper()}'**")
+                        st.write(f"De media, **1 de cada {ratio_usuarios} usuarios** utiliza la palabra '{top_word}' al dar su opinión.")
+                        st.caption(f"Y cuando lo hacen, ¡les encanta recalcarlo! En general, esta palabra se repite unas **{veces_por_resena:.1f} veces por reseña** cada vez que alguien decide usarla.")
+
+                    st.write("")
+                    
+                    if not top_pos.empty and not top_neg.empty:
+                        texto_pos = ", ".join([f"**{w}**" for w in top_pos["palabra"].head(3).tolist()])
+                        texto_neg = ", ".join([f"**{w}**" for w in top_neg["palabra"].head(3).tolist()])
+                        
+                        st.success(f"""
+                         **Análisis de la IA:** Cuando los clientes tienen una buena experiencia, suelen utilizar palabras asociadas a {texto_pos}. 
+                        Por el contrario, cuando surgen frustraciones, la conversación gira en torno a conceptos como {texto_neg}.
+                        """)
 
                 if not resultados["top_palabras_gen"].empty:
                     pos_pct = resultados["sentimiento_pct"].get("positivo", 0)
@@ -478,7 +524,7 @@ if st.session_state.analisis_activo:
 
                     with col_text:
                         st.markdown(f"**EL TEMA ESTRELLA: '{top_tema.upper()}'**")
-                        st.write(f"Aproximadamente el **{porcentaje_top}% de las opiniones** giran en torno a este concepto. Es lo primero que se le viene a la cabeza a tus clientes.")
+                        st.write(f"Aproximadamente el **{porcentaje_top}% de las opiniones** giran en torno a este concepto. Es lo primero que se le viene a la cabeza a los clientes.")
                         st.caption("Un ejemplo de un cliente real hablando sobre esto sería:")
                         st.info(f" *\"{ejemplo_resena.strip()}\"*")
 
