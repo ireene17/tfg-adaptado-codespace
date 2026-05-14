@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  app_reputacion:
+    build: .
+    container_name: streamlit_tfg
+    ports:
+      - "8503:8501"
