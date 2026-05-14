@@ -347,6 +347,7 @@ if st.session_state.analisis_activo:
                 st.markdown("### ¿De qué hablan exactamente los clientes?")
 
                 if not resultados["top_palabras_gen"].empty:
+
                     top_row = resultados["top_palabras_gen"].iloc[0]
                     top_word = top_row["palabra"]
                     
@@ -392,7 +393,6 @@ if st.session_state.analisis_activo:
                         Por el contrario, cuando surgen frustraciones, la conversación gira en torno a conceptos como {texto_neg}.
                         """)
 
-                if not resultados["top_palabras_gen"].empty:
                     pos_pct = resultados["sentimiento_pct"].get("positivo", 0)
                     neg_pct = resultados["sentimiento_pct"].get("negativo", 0)
                     
