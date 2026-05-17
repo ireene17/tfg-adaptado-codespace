@@ -11,15 +11,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class TrustpilotScraper:
-    def __init__(self, headless=True): 
+    def __init__(self, headless=False): #esto esta asi para que aparezca la interfaz de chrome y asi iniciar sesion manualmente en trustpilot y que se escaneen mas de 10pags de reseñas
         self.options = Options()
         
         profile_path = os.path.join(os.getcwd(), "chrome_profile")
         self.options.add_argument(f"user-data-dir={profile_path}")
         
-        self.options.add_argument("--headless=new") 
-        self.options.add_argument("--no-sandbox") 
-        self.options.add_argument("--disable-dev-shm-usage") 
+        if headless:
+            self.options.add_argument("--headless=new")
             
         self.options.add_argument("--disable-blink-features=AutomationControlled")
         self.options.add_argument("--window-size=1920,1080")
@@ -31,12 +30,7 @@ class TrustpilotScraper:
         self.driver = None
 
     def _configurar_driver(self):
-        if os.path.exists("/usr/bin/chromedriver"):
-            self.options.binary_location = "/usr/bin/chromium"
-            service = Service("/usr/bin/chromedriver")
-        else:
-            service = Service(ChromeDriverManager().install())
-        
+        service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=self.options)
         
         self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'})
@@ -111,13 +105,13 @@ class TrustpilotScraper:
         return pd.DataFrame(data, columns=["review"])
 
 def scrape_trustpilot(negocio_o_url):
-    scraper = TrustpilotScraper(headless=True) 
+    scraper = TrustpilotScraper(headless=False) 
     df = scraper.extraer_reseñas(negocio_o_url, max_pages=30)
     return df
 
 def obtener_nombre_limpio(texto):
-    nombre = texto.split("/")[-1].split("?")[0]
-    if "www." in nombre:
-        nombre = nombre.split("www.")[-1]
-    nombre = nombre.split(".")[0]
-    return nombre.capitalize()
+        nombre = texto.split("/")[-1].split("?")[0]
+        if "www." in nombre:
+            nombre = nombre.split("www.")[-1]
+        nombre = nombre.split(".")[0]
+        return nombre.capitalize()
